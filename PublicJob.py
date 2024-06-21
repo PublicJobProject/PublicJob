@@ -7,14 +7,16 @@ from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 import CreateMonthFile
-
+import ContentParsing
+options = ChromeOptions()
+options.add_experimental_option("excludeSwitches", ["enable-automation"])
 class Scrap:
     def __init__(self):
         self.folderDate = CreateMonthFile.createFile()
         
         self.file_path = "C:/RPA/지자체 희망일자리/RPA 관리 리스트_한개시트.xlsx"
         self.df = self.read_df_file(self.file_path)
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options = options)
         self.driver.implicitly_wait(10)
         
         for item in range(len(self.df)):
@@ -42,16 +44,23 @@ class Scrap:
 
         self.driver.get(url)
         for value in 검색어List:
+            self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()
             self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)
             self.driver.find_element(By.XPATH, 클릭Xpath).click()
 
             for i in range(1, 11):
                 TempList = []
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
-                self.driver.find_element(By.XPATH, Modified게시물Xpath).click()
+                try:
+                    self.driver.find_element(By.XPATH, Modified게시물Xpath).click()
+                except:
+                    continue
 
-                본문GetText = self.get_element_text_or_none(게시물_본문Xpath) # 본문 내용 가져오기
-                businessName = self.get_element_text_or_none(게시물_사업명Xpath) # 사업명 가져오기
+                try:
+                    본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text
+                except:
+                    pass
+                businessName = self.get_element_text_or_none(게시물_사업명Xpath,'게시물_사업명Xpath',본문GetText) # 사업명 가져오기
                 period = self.get_element_text_or_none(게시물_신청기간Xpath) # 신청기간 가져오기
                 workPlace = self.get_element_text_or_none(게시물_근무지Xpath) # 근무지 가져오기
                 salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath) #임금조건 가져오기
@@ -60,15 +69,27 @@ class Scrap:
                 registDate = self.get_element_text_or_none(게시물_등록일Xpath)
                 TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
                 DataList.append(TempList)
-                self.driver.find_element(By.XPATH, 게시물목록Xpath).click()
+                for i in range(3):
+                    try:
+                        self.driver.find_element(By.XPATH, 게시물목록Xpath).click()
+                    except:
+                        continue
+                    try:
+                        GetText = self.get_element_text_or_none(Modified게시물Xpath) # 목록 버튼 클릭
+                    except:
+                        continue    
+                    if GetText != "":
+                        print("목록 버튼 클릭 성공")
+                        break
         self.make_df_file(DataList)
 
-    def get_element_text_or_none(self, xpath):
-        text = None
+    def get_element_text_or_none(self, xpath,columnName,mainText):
+        #text = None
         try:
             text = self.driver.find_element(By.XPATH, xpath).text
         except :
-            pass
+            # 수집할 데이터 없을 시 본문에서 데이터 파싱하기
+            ContentParsing.contentParse(mainText,columnName)
         return text
 
     def read_df_file(self, file_path):
