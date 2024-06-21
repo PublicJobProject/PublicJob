@@ -6,12 +6,11 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-import CreateMonthFolder
+import CreateMonthFile
 
 class Scrap:
     def __init__(self):
-        self.folderDate = CreateMonthFolder.CreateFolder()
-       
+        self.folderDate = CreateMonthFile.createFile()
         
         self.file_path = "C:/RPA/지자체 희망일자리/RPA 관리 리스트_한개시트.xlsx"
         self.df = self.read_df_file(self.file_path)
