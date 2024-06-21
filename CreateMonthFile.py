@@ -60,6 +60,6 @@ def createFile():
 
     except Exception as e:
         print(f"오류 발생: {str(e)}")
-
+    return currentDate
 # 폴더 생성 및 파일 생성 예제 실행
-createFile()
+#createFile()
