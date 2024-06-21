@@ -51,6 +51,8 @@ class Scrap:
             for i in range(1, 11):
                 TempList = []
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
+                print("="*50)
+                print(f"{name} : [{value}] 검색어의 {i}번째 게시물 입니다")
                 try:
                     self.driver.find_element(By.XPATH, Modified게시물Xpath).click()
                 except:
