@@ -1,8 +1,8 @@
-# 필요한 모듈 임포트
 import os  # 파일 및 폴더 관리를 위한 os 모듈
 from datetime import datetime  # 날짜 및 시간 관리를 위한 datetime 모듈
 import openpyxl  # 엑셀 파일 생성 및 관리를 위한 openpyxl 모듈
 from openpyxl.styles import Font, PatternFill, Border, Side  # 엑셀 스타일 설정을 위한 클래스 import
+import shutil  # 파일 복사를 위한 shutil 모듈
 
 def createFile():
     try:
@@ -23,6 +23,18 @@ def createFile():
         if not os.path.exists(basePath):
             os.makedirs(basePath)  # 지자체 희망일자리 폴더 생성
             print("지자체 희망일자리 폴더가 생성되었습니다.")
+
+        # 지자체 희망일자리 폴더 안쪽에 RPA 관리 리스트_한개시트.xlsx 파일이 없으면 복사
+        rpaFile = os.path.join(basePath, "RPA 관리 리스트_한개시트.xlsx")
+        if not os.path.exists(rpaFile):
+            # 환경 변수에서 문서 디렉토리 가져오기
+            userDocuments = os.path.join(os.environ['USERPROFILE'], 'Documents')
+            sourceFile = os.path.join(userDocuments, "RPA 관리 리스트 원본", "RPA 관리 리스트_한개시트.xlsx")
+            if os.path.exists(sourceFile):
+                shutil.copy(sourceFile, rpaFile)  # 파일 복사
+                print(f"{rpaFile} 파일이 복사되었습니다.")
+            else:
+                print(f"원본 파일이 존재하지 않습니다: {sourceFile}")
 
         # 날짜 폴더가 존재하지 않으면 생성
         if not os.path.exists(folderPath):
