@@ -60,13 +60,13 @@ class Scrap:
                     본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text
                 except:
                     pass
-                businessName = self.get_element_text_or_none(게시물_사업명Xpath,'게시물_사업명Xpath',본문GetText) # 사업명 가져오기
-                period = self.get_element_text_or_none(게시물_신청기간Xpath) # 신청기간 가져오기
-                workPlace = self.get_element_text_or_none(게시물_근무지Xpath) # 근무지 가져오기
-                salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath) #임금조건 가져오기
+                businessName = self.get_element_text_or_none(게시물_사업명Xpath,'사업명',본문GetText) # 사업명 가져오기
+                period = self.get_element_text_or_none(게시물_신청기간Xpath,'신청기간',본문GetText) # 신청기간 가져오기
+                workPlace = self.get_element_text_or_none(게시물_근무지Xpath,'근무지',본문GetText) # 근무지 가져오기
+                salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath,'임금조건',본문GetText) #임금조건 가져오기
                 current_url = self.driver.current_url # 현재 페이지의 url 가져오기 
-                contact = self.get_element_text_or_none(게시물_문의처Xpath) # 문의처 가져오기
-                registDate = self.get_element_text_or_none(게시물_등록일Xpath)
+                contact = self.get_element_text_or_none(게시물_문의처Xpath,'문의처',본문GetText) # 문의처 가져오기
+                registDate = self.get_element_text_or_none(게시물_등록일Xpath,'등록일',본문GetText)
                 TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
                 DataList.append(TempList)
                 for i in range(3):
