@@ -89,7 +89,7 @@ class Scrap:
             text = self.driver.find_element(By.XPATH, xpath).text
         except :
             # 수집할 데이터 없을 시 본문에서 데이터 파싱하기
-            ContentParsing.contentParse(mainText,columnName)
+            text = ContentParsing.contentParse(mainText,columnName)
         return text
 
     def read_df_file(self, file_path):
