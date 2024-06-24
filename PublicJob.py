@@ -58,16 +58,14 @@ class Scrap:
 
         a = self.driver.get(url)  # 주어진 URL로 이동
 
-        for value in 검색어List: # 검색창 클리어하고 검색창 텍스트를 가져온다 > 택스트가 공백이 아니면 클리어 실패 3번해도 안되면 엑스페스 잘못
+        for value in 검색어List: # 
             try:
                 getText = ""
                 for i in range(3):
-                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
-                    if getText == "":
+                    elemet = self.driver.find_element(By.XPATH, 검색어입력Xpath)
+                    if elemet:
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
                         break
-                if getText == "":
-                    return "검색어 입력란 초기화 실패"
             except:
                 return "검색어입력Xpath를 찾을 수 없습니다"
             
@@ -77,21 +75,19 @@ class Scrap:
                     getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
                     if getText != "":
                         break
-                if getText == "":
-                    return "검색어 입력 실패"
+                    else:
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()
             except:
                 return "검색어 입력 실패"
                                 
             try: # 검색버튼 클릭
                 for i in range(3):
-                    elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
-                    if elemet:
-                        break
-                    if not elemet:
-                        return "클릭Xpath를 찾을 수 없습니다."
                     self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+                    First게시물Xpath = 게시물Xpath.replace(";", str(1))  # 게시물 XPath의 ';'를 숫자로 대체
+                    if First게시물Xpath != "":
+                        break
             except:
-                return "검색 버튼 클릭 실패"
+                return "클릭Xpath를 찾을 수 없습니다."
             
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
@@ -101,16 +97,14 @@ class Scrap:
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
                 print("="*50)
                 print(f"{name} : [{value}] 검색어의 {i}번째 게시물 입니다")
-                try:
+                try: # 게시물 클릭
                     for i in range(3):
-                        getText = self.driver.find_element(By.XPATH, Modified게시물Xpath)
+                        self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
+                        getText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text
                         if getText != "":
                             break
-                        if getText == "":
-                            return "Modified게시물Xpath를 찾을 수 없습니다."
-                    self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
                 except:
-                    return "게시물 클릭 실패"
+                    return "Modified게시물Xpath를 찾을 수 없습니다."
 
                 try:
                     for i in range(3):
