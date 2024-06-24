@@ -31,7 +31,8 @@ class Scrap:
                 GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
                 if GroupResult == "성공":
                     break
-            #print(GroupResult)  # 그룹 결과 출력
+                else:
+                    print(GroupResult)  # 그룹 실패결과 출력
 
     def dataCollect(self, url, item, name):
         DataList = []  # 데이터 저장을 위한 리스트 초기화
@@ -54,10 +55,15 @@ class Scrap:
         self.driver.get(url)  # 주어진 URL로 이동
         
         for value in 검색어List:
-            self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+            try:
+                self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+            except:
+                return "검색어입력Xpath를 찾을 수 없습니다"
             self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
-            self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
-
+            try:
+                self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+            except:
+                return "클릭Xpath를 찾을 수 없습니다"
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
