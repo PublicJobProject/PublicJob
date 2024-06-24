@@ -116,7 +116,7 @@ class Scrap:
                 TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
                 DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
                 
-                # 게시물 목록으로 돌아가기 시도
+                # 게시물 목록으로 돌아가기 시도 (예외처리)
                 for i in range(3):
                     try:
                         self.driver.find_element(By.XPATH, 게시물목록Xpath).click() # 목록 버튼 클릭
@@ -131,6 +131,7 @@ class Scrap:
                         break
 
         self.make_df_file(DataList)  # DataFrame으로 변환하여 파일로 저장
+        return "성공" 
 
     def get_element_text_or_none(self, xpath, columnName, mainText):
         try:
