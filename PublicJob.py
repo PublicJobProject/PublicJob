@@ -48,8 +48,8 @@ class Scrap:
         게시물_문의처Xpath = self.df.loc[item, '게시물_문의처Xpath']
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
-        self.driver.get(url)  # 주어진 URL로 이동
-        
+        a = self.driver.get(url)  # 주어진 URL로 이동
+
         for value in 검색어List:
             self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
             self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
