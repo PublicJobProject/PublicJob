@@ -72,7 +72,7 @@ class Scrap:
             try: #검색어 입력하고 입력된 값 가져오기 공백아니면 성공 공백이면 입력 실패 엑스페스는 위에서 이미 확인했음
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute(value)
                     if getText != "":
                         break
                     else:
