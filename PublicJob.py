@@ -56,10 +56,21 @@ class Scrap:
         
         for value in 검색어List:
             try:
-                self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                getText = ""
+                for i in range(3):
+                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                    if getText == "":
+                        break
+                if getText == "":
+                    return "검색어 입력란 초기화 실패"
             except:
                 return "검색어입력Xpath를 찾을 수 없습니다"
-            self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
+            
+            for i in range(3):
+                self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
+                getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                
             try:
                 self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
             except:
@@ -80,7 +91,7 @@ class Scrap:
                 try:
                     본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
                 except:
-                    pass  # 실패 시 아무 작업도 하지 않음
+                    return "본문Xpath를 찾을 수 없습니다"
                 
                 # 각 항목의 데이터 가져오기 시도 및 실패 시 재시도
                 for i in range(3):
