@@ -24,6 +24,9 @@ class Scrap:
         for item in range(len(self.df)):
             name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
             url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
+            success = self.df.loc[item, '성공여부'] # DataFrame에서 '성공여부' 가져오기
+            if success == "O":
+                continue
             GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
             print(GroupResult)  # 그룹 결과 출력
 
@@ -144,7 +147,7 @@ class Scrap:
         
         # DataFrame을 지정된 폴더 경로에 엑셀 및 CSV 파일로 저장
         tempdf.to_excel(f'C:/RPA/지자체 희망일자리/{self.folderDate}/{self.folderDate}.xlsx',index=False)
-        tempdf.to_csv(f'C:/RPA/지자체 희망일자리/{self.folderDate}/{self.folderDate}.csv',index=False)
+        #tempdf.to_csv(f'C:/RPA/지자체 희망일자리/{self.folderDate}/{self.folderDate}.csv',index=False)
 
     def __del__(self):
         self.driver.quit() # 드라이버 종료
