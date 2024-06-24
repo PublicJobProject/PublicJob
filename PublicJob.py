@@ -54,7 +54,7 @@ class Scrap:
 
         a = self.driver.get(url)  # 주어진 URL로 이동
 
-        for value in 검색어List:
+        for value in 검색어List: # 검색창 클리어하고 검색창 텍스트를 가져온다 > 택스트가 공백이 아니면 클리어 실패 3번해도 안되면 엑스페스 잘못
             try:
                 getText = ""
                 for i in range(3):
@@ -67,7 +67,7 @@ class Scrap:
             except:
                 return "검색어입력Xpath를 찾을 수 없습니다"
             
-            try:
+            try: #검색어 입력하고 입력된 값 가져오기 공백아니면 성공 공백이면 입력 실패 엑스페스는 위에서 이미 확인했음
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
                     getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
@@ -77,16 +77,17 @@ class Scrap:
                     return "검색어 입력 실패"
             except:
                 return "검색어 입력 실패"
-
-            for i in range(3):
-                self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
-                getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
-                
-
-            try:
-                self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+                                
+            try: # 검색버튼 클릭
+                for i in range(3):
+                    elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
+                    if elemet:
+                        break
+                    if not elemet:
+                        return "클릭Xpath를 찾을 수 없습니다."
+                    self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
             except:
-                return "클릭Xpath를 찾을 수 없습니다"
+                return "검색 버튼 클릭 실패"
             
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
@@ -105,13 +106,17 @@ class Scrap:
                             return "Modified게시물Xpath를 찾을 수 없습니다."
                     self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
                 except:
-                    return ""
+                    return "게시물 클릭 실패"
 
                 try:
-                    본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
+                    for i in range(3):
+                        본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
+                        if 본문GetText != "":
+                            break
+                        if 본문GetText == "":
+                            return "게시물_본문Xpath를 찾을 수 없습니다."
                 except:
-
-                    return "본문Xpath를 찾을 수 없습니다." 
+                    return "본문 가져오기 실패" 
 
                 # 각 항목의 데이터 가져오기 시도 및 실패 시 재시도
                 for i in range(3):
@@ -168,8 +173,8 @@ class Scrap:
                         continue
                     if GetText != None:
                         print("목록 버튼 클릭 성공")
-                        break
-
+                        break   
+        
         self.make_df_file(DataList)  # DataFrame으로 변환하여 파일로 저장
         return "성공" 
 
