@@ -56,42 +56,44 @@ class Scrap:
         게시물_문의처Xpath = self.df.loc[item, '게시물_문의처Xpath']
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
-        a = self.driver.get(url)  # 주어진 URL로 이동
+        self.driver.get(url)  # 주어진 URL로 이동
 
         for value in 검색어List: # 검색창 클리어하고 검색창 텍스트를 가져온다 > 택스트가 공백이 아니면 클리어 실패 3번해도 안되면 엑스페스 잘못
             try:
                 getText = ""
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
                     if getText == "":
                         break
-                if getText == "":
-                    return "검색어 입력란 초기화 실패"
+                if getText != "":
+                     return "검색어 입력란 초기화 실패"  
             except:
                 return "검색어입력Xpath를 찾을 수 없습니다"
             
             try: #검색어 입력하고 입력된 값 가져오기 공백아니면 성공 공백이면 입력 실패 엑스페스는 위에서 이미 확인했음
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
-                    if getText != "":
+                    self.driver.find_element(By.XPATH, 클릭Xpath).click()
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                    if getText == value:
                         break
-                if getText == "":
+                if getText != value:
                     return "검색어 입력 실패"
             except:
                 return "검색어 입력 실패"
                                 
-            try: # 검색버튼 클릭
-                for i in range(3):
-                    elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
-                    if elemet:
-                        break
-                    if not elemet:
-                        return "클릭Xpath를 찾을 수 없습니다."
-                    self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
-            except:
-                return "검색 버튼 클릭 실패"
+            # 검색어 입력 및 검색버튼 클릭 로직 통합으로 인한 주석처리
+            # try: # 검색버튼 클릭
+            #     for i in range(3):
+            #         elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
+            #         if elemet:
+            #             break
+            #         if not elemet:
+            #             return "클릭Xpath를 찾을 수 없습니다."
+            #         self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+            # except:
+            #     return "검색 버튼 클릭 실패"
             
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
