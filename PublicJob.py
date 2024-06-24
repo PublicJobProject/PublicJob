@@ -27,8 +27,11 @@ class Scrap:
             success = self.df.loc[item, '성공여부'] # DataFrame에서 '성공여부' 가져오기
             if success == "O":
                 continue
-            GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
-            print(GroupResult)  # 그룹 결과 출력
+            for i in range(3):
+                GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
+                if GroupResult == "성공":
+                    break
+            #print(GroupResult)  # 그룹 결과 출력
 
     def dataCollect(self, url, item, name):
         DataList = []  # 데이터 저장을 위한 리스트 초기화
