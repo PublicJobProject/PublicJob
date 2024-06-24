@@ -56,14 +56,32 @@ class Scrap:
 
         for value in 검색어List:
             try:
-                self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                for i in range(3):
+                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                    if getText == "":
+                        break
+                if getText == "":
+                    return "검색어 입력란 초기화 실패"
             except:
                 return "검색어입력Xpath를 찾을 수 없습니다"
-            self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
+            
+            try:
+                for i in range(3):
+                    self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).text
+                    if getText != "":
+                        break
+                if getText == "":
+                    return "검색어 입력 실패"
+            except:
+                return "검색어 입력 실패"
+
             try:
                 self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
             except:
                 return "클릭Xpath를 찾을 수 없습니다"
+            
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
@@ -73,14 +91,20 @@ class Scrap:
                 print("="*50)
                 print(f"{name} : [{value}] 검색어의 {i}번째 게시물 입니다")
                 try:
+                    for i in range(3)
+                        getText = self.driver.find_element(By.XPATH, Modified게시물Xpath)
+                        if getText != "":
+                            break
+                        if getText == "":
+                            return "Modified게시물Xpath를 찾을 수 없습니다."
                     self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
                 except:
-                    continue  # 실패 시 다음 반복으로 넘어감
+                    return ""
 
                 try:
                     본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
                 except:
-                    pass  # 실패 시 아무 작업도 하지 않음
+                    return "본문Xpath를 찾을 수 없습니다." 
                 
                 # 각 항목의 데이터 가져오기 시도 및 실패 시 재시도
                 for i in range(3):
