@@ -210,6 +210,5 @@ class Scrap:
     def __del__(self):  # Scrap 클래스가 삭제될 때 웹 드라이버를 종료합니다.
         self.driver.quit()
 
-print("테스트")
 if __name__ == "__main__":
     Jobs = Scrap()  # Scrap 클래스의 인스턴스를 생성하여 실행합니다.
