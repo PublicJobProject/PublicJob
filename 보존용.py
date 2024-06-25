@@ -9,40 +9,34 @@ import ContentParsing  # 사용자 정의 모듈 import
 import time  # 시간 지연을 위한 import
 from openpyxl import load_workbook  # 엑셀 파일 열기 위한 openpyxl import
 from openpyxl.styles import PatternFill, Font, Border, Side  # 엑셀 셀 스타일링을 위한 openpyxl 스타일 import
-from preventSleep import prevent_sleep, allow_sleep
 
 options = ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-automation"])  # Selenium 자동화 방지 설정
 
 class Scrap:
     def __init__(self):
-        prevent_sleep()
         self.folderDate = CreateMonthFile.createFile()  # 폴더 생성 날짜 지정
         self.file_path = "C:/RPA/지자체 희망일자리/RPA 관리 리스트_한개시트.xlsx"  # 파일 경로 지정
         self.df = self.read_df_file(self.file_path)  # Excel 파일을 DataFrame으로 읽어오는 함수 호출
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)  # Chrome 웹 드라이버 설정
         self.driver.implicitly_wait(10)  # 웹 요소를 찾기 위한 암묵적 대기 시간 설정
         
-        try:
-            for item in range(len(self.df)):
-                name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
-                url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
-                success = self.df.loc[item, '성공여부']  # DataFrame에서 '성공여부' 가져오기
-                if success == "O":
-                    continue
-                for i in range(3):
-                    GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
-                    if GroupResult == "성공":
-                        self.df.loc[item, '성공여부'] = "O"  # 성공 여부 업데이트
-                        break
-                    else:
-                        print(f"X: {GroupResult}")  # 실패 결과 출력
-                        self.df.loc[item, '성공여부'] = f"X: {GroupResult}"  # 실패 여부 업데이트
-                # 엑셀 파일에 성공 여부를 저장하고 스타일을 설정
-                self.save_success_status(item)
-        finally:
-            allow_sleep
-
+        for item in range(len(self.df)):
+            name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
+            url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
+            success = self.df.loc[item, '성공여부']  # DataFrame에서 '성공여부' 가져오기
+            if success == "O":
+                continue
+            for i in range(3):
+                GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
+                if GroupResult == "성공":
+                    self.df.loc[item, '성공여부'] = "O"  # 성공 여부 업데이트
+                    break
+                else:
+                    print(f"X: {GroupResult}")  # 실패 결과 출력
+                    self.df.loc[item, '성공여부'] = f"X: {GroupResult}"  # 실패 여부 업데이트
+            # 엑셀 파일에 성공 여부를 저장하고 스타일을 설정
+            self.save_success_status(item)
 
     def dataCollect(self, url, item, name):
         DataList = []  # 데이터 저장을 위한 리스트 초기화
@@ -79,23 +73,22 @@ class Scrap:
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
                     self.driver.find_element(By.XPATH, 클릭Xpath).click()
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute(value)
                     if getText == value:
                         break
+                    if getText != value:
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()
             except:
                 return "검색어 입력 실패"
                                 
-            # 검색어 입력 및 검색버튼 클릭 로직 통합으로 인한 주석처리
-            # try: # 검색버튼 클릭
-            #     for i in range(3):
-            #         elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
-            #         if elemet:
-            #             break
-            #         if not elemet:
-            #             return "클릭Xpath를 찾을 수 없습니다."
-            #         self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
-            # except:
-            #     return "검색 버튼 클릭 실패"
+            #try: # 검색버튼 클릭
+            #    for i in range(3):
+            #        self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+            #        First게시물Xpath = 게시물Xpath.replace(";", str(1))  # 게시물 XPath의 ';'를 숫자로 대체
+            #        if First게시물Xpath != "":
+            #            break
+            #except:
+            #    return "클릭Xpath를 찾을 수 없습니다."
             
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
@@ -119,6 +112,8 @@ class Scrap:
                         본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
                         if 본문GetText != "":
                             break
+                        if 본문GetText == "":
+                            return "게시물_본문Xpath를 찾을 수 없습니다."
                 except:
                     return "본문 가져오기 실패" 
 
@@ -202,28 +197,26 @@ class Scrap:
         tempdf.to_excel(f'C:/RPA/지자체 희망일자리/{self.folderDate}/{self.folderDate}.xlsx', index=False)
 
     def save_success_status(self, item): # openpyxl을 사용하여 기존 엑셀 파일을 열고, 성공 여부를 업데이트 및 스타일을 설정합니다.
-        wb = load_workbook(self.file_path) # 기존 엑셀 파일 열기
-        ws = wb.active # 활성 시트 가져오기
-        row_index = item + 2 # 엑셀 행 인덱스 설정 (1-based index)
-        col_index = self.df.columns.get_loc('성공여부') + 1 # 엑셀 열 인덱스 설정 (1-based index)
-        cell = ws.cell(row=row_index, column=col_index) # 해당 셀 가져오기
-        cell.value = self.df.loc[item, '성공여부'] # 성공 여부 업데이트
+        wb = load_workbook(self.file_path)  # 기존 엑셀 파일 열기
+        ws = wb.active  # 활성 시트 가져오기
+        row_index = item + 2  # 엑셀 행 인덱스 설정 (1-based index)
+        col_index = self.df.columns.get_loc('성공여부') + 1  # 엑셀 열 인덱스 설정 (1-based index)
+        cell = ws.cell(row=row_index, column=col_index)  # 해당 셀 가져오기
+        cell.value = self.df.loc[item, '성공여부']  # 성공 여부 업데이트
 
         # 스타일 설정
-        if row_index == 2:
-            fill = PatternFill(start_color="FAC090", end_color="FAC090", fill_type="solid") # 셀 배경색 설정
-            font = Font(bold=True) # 글자 볼드체 설정
-            border = Border(left=Side(style='thin'), 
-                            right=Side(style='thin'), 
-                            top=Side(style='thin'), 
-                            bottom=Side(style='thin')) # 셀 테두리 설정 (좌, 우, 상, 하)
-            
-            header_cell = ws.cell(row=1, column=col_index)
-            header_cell.fill = fill
-            header_cell.font = font
-            header_cell.border = border
+        fill = PatternFill(start_color="FAC090", end_color="FAC090", fill_type="solid")  # 셀 배경색 설정
+        font = Font(bold=True)  # 글자 볼드체 설정
+        border = Border(left=Side(style='thin'), 
+                        right=Side(style='thin'), 
+                        top=Side(style='thin'), 
+                        bottom=Side(style='thin'))  # 셀 테두리 설정 (좌, 우, 상, 하)
+        
+        cell.fill = fill  # 셀 배경색 적용ㄴㄴ
+        cell.font = font  # 글자 스타일 적용
+        cell.border = border  # 셀 테두리 적용
 
-        wb.save(self.file_path) # 엑셀 파일 저장
+        wb.save(self.file_path)  # 엑셀 파일 저장
 
     def __del__(self): # Scrap 클래스가 삭제될 때 웹 드라이버를 종료합니다.
         self.driver.quit()
