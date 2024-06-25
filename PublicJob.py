@@ -9,14 +9,12 @@ import ContentParsing  # 사용자 정의 모듈 import
 import time  # 시간 지연을 위한 import
 from openpyxl import load_workbook  # 엑셀 파일 열기 위한 openpyxl import
 from openpyxl.styles import PatternFill, Font, Border, Side  # 엑셀 셀 스타일링을 위한 openpyxl 스타일 import
-from preventSleep import prevent_sleep, allow_sleep
 
 options = ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-automation"])  # Selenium 자동화 방지 설정
 
 class Scrap:
     def __init__(self):
-        prevent_sleep()
         self.DataList = []  # 데이터 저장을 위한 리스트 초기화
 
         self.folderDate = CreateMonthFile.createFile()  # 폴더 생성 날짜 지정
@@ -25,25 +23,22 @@ class Scrap:
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)  # Chrome 웹 드라이버 설정
         self.driver.implicitly_wait(10)  # 웹 요소를 찾기 위한 암묵적 대기 시간 설정
         
-        try:
-            for item in range(len(self.df)):
-                name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
-                url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
-                success = self.df.loc[item, '성공여부']  # DataFrame에서 '성공여부' 가져오기
-                if success == "O":
-                    continue
-                for i in range(3):
-                    GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
-                    if GroupResult == "성공":
-                        self.df.loc[item, '성공여부'] = "O"  # 성공 여부 업데이트
-                        break
-                    else:
-                        print(f"X: {GroupResult}")  # 실패 결과 출력
-                        self.df.loc[item, '성공여부'] = f"X: {GroupResult}"  # 실패 여부 업데이트
-                # 엑셀 파일에 성공 여부를 저장하고 스타일을 설정
-                self.save_success_status(item)
-        finally:
-            allow_sleep
+        for item in range(len(self.df)):
+            name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
+            url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
+            success = self.df.loc[item, '성공여부']  # DataFrame에서 '성공여부' 가져오기
+            if success == "O":
+                continue
+            for i in range(3):
+                GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
+                if GroupResult == "성공":
+                    self.df.loc[item, '성공여부'] = "O"  # 성공 여부 업데이트
+                    break
+                else:
+                    print(f"X: {GroupResult}")  # 실패 결과 출력
+                    self.df.loc[item, '성공여부'] = f"X: {GroupResult}"  # 실패 여부 업데이트
+            # 엑셀 파일에 성공 여부를 저장하고 스타일을 설정
+            self.save_success_status(item)
 
 
     def dataCollect(self, url, item, name):
