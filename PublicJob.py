@@ -78,18 +78,6 @@ class Scrap:
                         break
             except:
                 return "검색어 입력 실패"
-                                
-            # 검색어 입력 및 검색버튼 클릭 로직 통합으로 인한 주석처리
-            # try: # 검색버튼 클릭
-            #     for i in range(3):
-            #         elemet = self.driver.find_element(By.XPATH, 클릭Xpath)
-            #         if elemet:
-            #             break
-            #         if not elemet:
-            #             return "클릭Xpath를 찾을 수 없습니다."
-            #         self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
-            # except:
-            #     return "검색 버튼 클릭 실패"
             
             for i in range(1, 11):
                 TempList = []  # 임시 리스트 초기화
@@ -116,72 +104,43 @@ class Scrap:
                 except:
                     return "본문 가져오기 실패" 
 
-                # 각 항목의 데이터 가져오기 시도 및 실패 시 재시도
-                for i in range(3):
-                    businessName = self.get_element_text_or_none(게시물_사업명Xpath, '사업명', 본문GetText) # 사업명 가져오기
-                    if businessName == None:
-                        time.sleep(0.5)
-                    else:
-                        break
-                for i in range(3):
-                    period = self.get_element_text_or_none(게시물_신청기간Xpath, '신청기간', 본문GetText) # 신청기간 가져오기
-                    if period == None:
-                        time.sleep(0.5)
-                    else:
-                        break
-                for i in range(3):
-                    workPlace = self.get_element_text_or_none(게시물_근무지Xpath, '근무지', 본문GetText) # 근무지 가져오기
-                    if workPlace == None:
-                        time.sleep(0.5)
-                    else:
-                        break
-                for i in range(3):
-                    salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath, '임금조건', 본문GetText) # 임금조건 가져오기
-                    if salary == None:
-                        time.sleep(0.5)
-                    else:
-                        break
+                # 수집할 정보 가져오기
+                businessName = self.get_element_text_or_none(게시물_사업명Xpath, '사업명', 본문GetText) # 사업명 가져오기
+                period = self.get_element_text_or_none(게시물_신청기간Xpath, '신청기간', 본문GetText) # 신청기간 가져오기
+                workPlace = self.get_element_text_or_none(게시물_근무지Xpath, '근무지', 본문GetText) # 근무지 가져오기
+                salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath, '임금조건', 본문GetText) # 임금조건 가져오기
                 current_url = self.driver.current_url  # 현재 페이지의 URL 가져오기
-                for i in range(3):
-                    contact = self.get_element_text_or_none(게시물_문의처Xpath, '문의처', 본문GetText) # 문의처 가져오기
-                    if contact == None:
-                        time.sleep(0.5)
-                    else:
-                        break
-                for i in range(3):
-                    registDate = self.get_element_text_or_none(게시물_등록일Xpath, '등록일', 본문GetText) # 등록일 가져오기
-                    if registDate == None:
-                        time.sleep(0.5)
-                    else:
-                        break
+                contact = self.get_element_text_or_none(게시물_문의처Xpath, '문의처', 본문GetText) # 문의처 가져오기
+                registDate = self.get_element_text_or_none(게시물_등록일Xpath, '등록일', 본문GetText) # 등록일 가져오기
                 
                 # 임시 리스트에 데이터 추가
                 TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
                 self.DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
                 
                 # 게시물 목록으로 돌아가기 시도 (예외처리)
-                for i in range(3):
-                    try:
+                try:
+                    for i in range(3):
                         self.driver.find_element(By.XPATH, 게시물목록Xpath).click() # 목록 버튼 클릭
-                    except:
-                        continue
-                    try:
-                        GetText = self.driver.find_element(By.XPATH, Modified게시물Xpath).text # 목록 버튼 클릭 성공 여부 확인을 위해 메인화면 게시물 텍스트 수집
-                    except:
-                        continue
-                    if GetText != None:
-                        print("목록 버튼 클릭 성공")
-                        break   
+                        GetText = 게시물Xpath.replace(";", "1")
+                        if GetText != None:
+                            print("목록 버튼 클릭 성공")
+                            break   
+                except:
+                    return "목록 버튼 클릭 실패"
         
         self.make_df_file(self.DataList)  # DataFrame으로 변환하여 파일로 저장
         return "성공" 
 
     def get_element_text_or_none(self, xpath, columnName, mainText):
-        try:
-            text = self.driver.find_element(By.XPATH, xpath).text  # 웹 요소에서 텍스트 가져오기 시도
-        except:
-            text = ContentParsing.contentParse(mainText, columnName)  # 실패 시 본문에서 데이터 파싱하기
-        return text  # 가져온 텍스트 또는 파싱한 결과 반환
+        for i in range(3):
+            try:
+                text = self.driver.find_element(By.XPATH, xpath).text  # 웹 요소에서 텍스트 가져오기 시도
+            except:
+                text = ContentParsing.contentParse(mainText, columnName)  # 실패 시 본문에서 데이터 파싱하기
+            if text == None:
+                time.sleep(0.5)
+            else:
+                return text  # 가져온 텍스트 또는 파싱한 결과 반환
 
     def read_df_file(self, file_path): # 주어진 파일 경로에서 엑셀 파일을 읽어와 DataFrame으로 반환합니다.
         df = pd.read_excel(file_path)
