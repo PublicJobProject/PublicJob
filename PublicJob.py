@@ -17,6 +17,8 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])  # Sel
 class Scrap:
     def __init__(self):
         prevent_sleep()
+        self.DataList = []  # 데이터 저장을 위한 리스트 초기화
+
         self.folderDate = CreateMonthFile.createFile()  # 폴더 생성 날짜 지정
         self.file_path = "C:/RPA/지자체 희망일자리/RPA 관리 리스트_한개시트.xlsx"  # 파일 경로 지정
         self.df = self.read_df_file(self.file_path)  # Excel 파일을 DataFrame으로 읽어오는 함수 호출
@@ -45,7 +47,6 @@ class Scrap:
 
 
     def dataCollect(self, url, item, name):
-        DataList = []  # 데이터 저장을 위한 리스트 초기화
         검색어입력Xpath = self.df.loc[item, '검색어입력Xpath']  # DataFrame에서 '검색어입력Xpath' 가져오기
         클릭Xpath = self.df.loc[item, '클릭Xpath']  # DataFrame에서 '클릭Xpath' 가져오기
         게시물Xpath = self.df.loc[item, '게시물Xpath']  # DataFrame에서 '게시물Xpath' 가져오기
@@ -163,7 +164,7 @@ class Scrap:
                 
                 # 임시 리스트에 데이터 추가
                 TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
-                DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
+                self.DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
                 
                 # 게시물 목록으로 돌아가기 시도 (예외처리)
                 for i in range(3):
@@ -179,7 +180,7 @@ class Scrap:
                         print("목록 버튼 클릭 성공")
                         break   
         
-        self.make_df_file(DataList)  # DataFrame으로 변환하여 파일로 저장
+        self.make_df_file(self.DataList)  # DataFrame으로 변환하여 파일로 저장
         return "성공" 
 
     def get_element_text_or_none(self, xpath, columnName, mainText):
