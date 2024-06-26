@@ -1,6 +1,6 @@
 import re
 
-xPath = "/html/body/form/table[3]/tbody/tr/td/table[1]/tbody/tr[;]/td[3]/p/a"
+xPath = "<xPath>//input[@type='text' and @class='search']tr[;]</xPath><FrameInfoList><FrameInfo TagName='iframe' Name='' Title='새올 행정시스템' Id='' Class='' /></FrameInfoList>"
 
 def xPathParse(xPath):
     # iframe 제거한 내용을 추출
@@ -32,8 +32,11 @@ def xPathParse(xPath):
             FullxPathmatches = ''.join(FullxPathmatches)
             print(FullxPathmatches)
             return FullxPathmatches
+        
+    elif len(indexList) == 0 or len(indexList) == 1:
+        FullxPathmatches = ''.join(xPathmatches)
+        print(FullxPathmatches)
+        return FullxPathmatches
 
-    # 세미콜론이 없거나 한 개만 있는 경우
-    return None
 
 xPathParse(xPath)
