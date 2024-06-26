@@ -64,8 +64,6 @@ class Scrap:
         xPathPattern = r'<xPath>(.*?)</xPath>'
         xPathmatches = re.findall(xPathPattern, 검색어입력Xpath)
 
-        if 검색어입력Xpath is not None:
-            클릭Xpath = xPathParsing.xPathParse(클릭Xpath)
 
         self.driver.get(url)  # 주어진 URL로 이동
 
