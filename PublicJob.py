@@ -63,8 +63,8 @@ class Scrap:
 
         # xPath에 iframe이 포함되어 있는지 확인
         xPathPattern = r'<xPath>(.*?)</xPath>'
-        xPathmatch = False # 초기화
-
+        xPathmatch = False # False로 초기화
+        
         if 검색어입력Xpath in xPathPattern:
             xPathmatch = True
             
@@ -82,82 +82,84 @@ class Scrap:
             게시물_문의처Xpath = xPathParsing.xPathParse(게시물_문의처Xpath)
             게시물목록Xpath = xPathParsing.xPathParse(게시물목록Xpath)
             
-            # iframe 스위치 하기 switch()
-            try:
-                iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
-                self.driver.switch_to.frame(iframe)
-            except:
-                return "iframe 전환 실패"
+        # iframe 스위치 하기 switch()
 
-        for value in 검색어List:
-            try:
-                getText = ""
-                for i in range(3):
-                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
-                    if getText == "":
-                        break
-            except:
-                return "검색어입력Xpath를 찾을 수 없습니다"
-
-            try:
-                for i in range(3):
-                    self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
-                    self.driver.find_element(By.XPATH, 클릭Xpath).click()
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
-                    if getText == value:
-                        break
-            except:
-                return "검색어 입력 실패"
-
-            for i in range(1, 11):
-                TempList = []  # 임시 리스트 초기화
-                Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
-
-                TempList = []
-                Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
-                print("="*50)
-                print(f"{name} : [{value}] 검색어의 {i}번째 게시물 입니다")
-                try:  # 게시물 클릭
+        try:
+            iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
+            self.driver.switch_to.frame(iframe)
+        # except:
+        #     return "iframe 전환 실패"
+        
+        finally:
+            for value in 검색어List:
+                try:
+                    getText = ""
                     for i in range(3):
-                        self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
-                        getText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text
-                        if getText != "":
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                        getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                        if getText == "":
                             break
                 except:
-                    return "Modified게시물Xpath를 찾을 수 없습니다."
+                    return "검색어입력Xpath를 찾을 수 없습니다"
 
                 try:
                     for i in range(3):
-                        본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
-                        if 본문GetText != "":
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
+                        self.driver.find_element(By.XPATH, 클릭Xpath).click()
+                        getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                        if getText == value:
                             break
                 except:
-                    return "본문 가져오기 실패"
+                    return "검색어 입력 실패"
 
-                # 수집할 정보 가져오기
-                businessName = self.get_element_text_or_none(게시물_사업명Xpath, '사업명', 본문GetText)  # 사업명 가져오기
-                period = self.get_element_text_or_none(게시물_신청기간Xpath, '신청기간', 본문GetText)  # 신청기간 가져오기
-                workPlace = self.get_element_text_or_none(게시물_근무지Xpath, '근무지', 본문GetText)  # 근무지 가져오기
-                salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath, '임금조건', 본문GetText)  # 임금조건 가져오기
-                current_url = self.driver.current_url  # 현재 페이지의 URL 가져오기
-                contact = self.get_element_text_or_none(게시물_문의처Xpath, '문의처', 본문GetText)  # 문의처 가져오기
-                registDate = self.get_element_text_or_none(게시물_등록일Xpath, '등록일', 본문GetText)  # 등록일 가져오기
+                for i in range(1, 11):
+                    TempList = []  # 임시 리스트 초기화
+                    Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
 
-                # 임시 리스트에 데이터 추가
-                TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
-                self.DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
+                    TempList = []
+                    Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
+                    print("="*50)
+                    print(f"{name} : [{value}] 검색어의 {i}번째 게시물 입니다")
+                    try:  # 게시물 클릭
+                        for i in range(3):
+                            self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
+                            getText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text
+                            if getText != "":
+                                break
+                    except:
+                        return "Modified게시물Xpath를 찾을 수 없습니다."
 
-                # 게시물 목록으로 돌아가기 시도 (예외처리)
-                try:
-                    for i in range(3):
-                        self.driver.find_element(By.XPATH, 게시물목록Xpath).click()  # 목록 버튼 클릭
-                        GetText = 게시물Xpath.replace(";", "6")
-                        if GetText is not None:
-                            print("목록 버튼 클릭 성공")
-                            break
-                except:
-                    return "목록 버튼 클릭 실패"
+                    try:
+                        for i in range(3):
+                            본문GetText = self.driver.find_element(By.XPATH, 게시물_본문Xpath).text  # 게시물 본문 텍스트 가져오기
+                            if 본문GetText != "":
+                                break
+                    except:
+                        return "본문 가져오기 실패"
+
+                    # 수집할 정보 가져오기
+                    businessName = self.get_element_text_or_none(게시물_사업명Xpath, '사업명', 본문GetText)  # 사업명 가져오기
+                    period = self.get_element_text_or_none(게시물_신청기간Xpath, '신청기간', 본문GetText)  # 신청기간 가져오기
+                    workPlace = self.get_element_text_or_none(게시물_근무지Xpath, '근무지', 본문GetText)  # 근무지 가져오기
+                    salary = self.get_element_text_or_none(게시물_임금조건_보수_Xpath, '임금조건', 본문GetText)  # 임금조건 가져오기
+                    current_url = self.driver.current_url  # 현재 페이지의 URL 가져오기
+                    contact = self.get_element_text_or_none(게시물_문의처Xpath, '문의처', 본문GetText)  # 문의처 가져오기
+                    registDate = self.get_element_text_or_none(게시물_등록일Xpath, '등록일', 본문GetText)  # 등록일 가져오기
+
+                    # 임시 리스트에 데이터 추가
+                    TempList.extend([name, businessName, period, workPlace, salary, current_url, registDate, contact])
+                    self.DataList.append(TempList)  # 결과 리스트에 임시 리스트 추가
+
+                    # 게시물 목록으로 돌아가기 시도 (예외처리)
+                    try:
+                        for i in range(3):
+                            self.driver.find_element(By.XPATH, 게시물목록Xpath).click()  # 목록 버튼 클릭
+                            GetText = 게시물Xpath.replace(";", "6")
+                            if GetText is not None:
+                                print("목록 버튼 클릭 성공")
+                                break
+                    except:
+                        return "목록 버튼 클릭 실패"
 
         self.make_df_file(self.DataList)  # DataFrame으로 변환하여 파일로 저장
         self.driver.switch_to.default_content()
