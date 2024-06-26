@@ -44,6 +44,7 @@ class Scrap:
             self.save_success_status(item)
 
     def dataCollect(self, url, item, name):
+        self.driver.get(url)  # 주어진 URL로 이동
         검색어입력Xpath = self.df.loc[item, '검색어입력Xpath']  # DataFrame에서 '검색어입력Xpath' 가져오기
         클릭Xpath = self.df.loc[item, '클릭Xpath']  # DataFrame에서 '클릭Xpath' 가져오기
         게시물Xpath = self.df.loc[item, '게시물Xpath']  # DataFrame에서 '게시물Xpath' 가져오기
@@ -60,14 +61,31 @@ class Scrap:
         게시물_문의처Xpath = self.df.loc[item, '게시물_문의처Xpath']
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
-        #
+        # xPath에 iframe이 포함되어 있는지 확인
         xPathPattern = r'<xPath>(.*?)</xPath>'
-        xPathmatches = re.findall(xPathPattern, 검색어입력Xpath)
-
-
-        self.driver.get(url)  # 주어진 URL로 이동
-
-        #switch()
+        if 검색어입력Xpath in xPathPattern:
+            xPathmatch = True
+            
+        # iframe 이포함되어 있다면 모든 엑스페스 전부 ifrmae 벗기기
+        if xPathmatch:
+            검색어입력Xpath = xPathParsing.xPathParse(검색어입력Xpath)
+            클릭Xpath = xPathParsing.xPathParse(클릭Xpath)
+            게시물Xpath = xPathParsing.xPathParse(게시물Xpath)
+            게시물_사업명Xpath = xPathParsing.xPathParse(게시물_사업명Xpath)
+            게시물_신청기간Xpath = xPathParsing.xPathParse(게시물_신청기간Xpath)
+            게시물_근무지Xpath = xPathParsing.xPathParse(게시물_근무지Xpath)
+            게시물_임금조건_보수_Xpath = xPathParsing.xPathParse(게시물_임금조건_보수_Xpath)
+            게시물_본문Xpath = xPathParsing.xPathParse(게시물_본문Xpath)
+            게시물_등록일Xpath = xPathParsing.xPathParse(게시물_등록일Xpath)
+            게시물_문의처Xpath = xPathParsing.xPathParse(게시물_문의처Xpath)
+            게시물목록Xpath = xPathParsing.xPathParse(게시물목록Xpath)
+            
+            # iframe 스위치 하기 switch()
+            try:
+                iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
+                self.driver.switch_to.frame(iframe)
+            except:
+                return "iframe 전환 실패"
 
         for value in 검색어List:
             try:
