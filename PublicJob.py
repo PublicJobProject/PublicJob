@@ -9,6 +9,8 @@ import ContentParsing  # 사용자 정의 모듈 import
 import time  # 시간 지연을 위한 import
 from openpyxl import load_workbook, Workbook  # 엑셀 파일 열기 및 새 파일 생성 위한 openpyxl import
 from openpyxl.styles import PatternFill, Font, Border, Side  # 엑셀 셀 스타일링을 위한 openpyxl 스타일 import
+import re
+import xPathParsing
 
 options = ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-automation"])  # Selenium 자동화 방지 설정
@@ -58,7 +60,16 @@ class Scrap:
         게시물_문의처Xpath = self.df.loc[item, '게시물_문의처Xpath']
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
+        #
+        xPathPattern = r'<xPath>(.*?)</xPath>'
+        xPathmatches = re.findall(xPathPattern, 검색어입력Xpath)
+
+        if 검색어입력Xpath is not None:
+            클릭Xpath = xPathParsing.xPathParse(클릭Xpath)
+
         self.driver.get(url)  # 주어진 URL로 이동
+
+        #switch()
 
         for value in 검색어List:
             try:
