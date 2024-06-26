@@ -7,9 +7,7 @@ from selenium.webdriver.common.by import By  # 웹 요소 검색을 위한 By im
 import CreateMonthFile  # 사용자 정의 모듈 import
 import ContentParsing  # 사용자 정의 모듈 import
 import time  # 시간 지연을 위한 import
-from openpyxl import load_workbook, Workbook  # 엑셀 파일 열기 및 새 파일 생성 위한 openpyxl import
-from openpyxl.styles import PatternFill, Font, Border, Side  # 엑셀 셀 스타일링을 위한 openpyxl 스타일 import
-import re
+import StyleSetting
 import xPathParsing
 
 options = ChromeOptions()
@@ -27,21 +25,22 @@ class Scrap:
         self.driver.implicitly_wait(10)  # 웹 요소를 찾기 위한 암묵적 대기 시간 설정
 
         for item in range(len(self.df)):
-            name = self.df.loc[item, '구청명']  # DataFrame에서 '구청명' 가져오기
-            url = self.df.loc[item, '게시판 URL']  # DataFrame에서 '게시판 URL' 가져오기
-            success = self.df.loc[item, '성공여부']  # DataFrame에서 '성공여부' 가져오기
+            name = self.df.loc[item, '구청명']
+            url = self.df.loc[item, '게시판 URL']
+            success = self.df.loc[item, '성공여부']
             if success == "O":
                 continue
             for i in range(3):
-                GroupResult = self.dataCollect(url, item, name)  # 데이터 수집 함수 호출
+                GroupResult = self.dataCollect(url, item, name)
                 if GroupResult == "성공":
-                    self.df.loc[item, '성공여부'] = "O"  # 성공 여부 업데이트
+                    self.df.loc[item, '성공여부'] = "O"
                     break
                 else:
-                    print(f"X: {GroupResult}")  # 실패 결과 출력
-                    self.df.loc[item, '성공여부'] = f"X: {GroupResult}"  # 실패 여부 업데이트
-            # 엑셀 파일에 성공 여부를 저장하고 스타일을 설정
-            self.save_success_status(item)
+                    print(f"X: {GroupResult}")
+                    self.df.loc[item, '성공여부'] = f"X: {GroupResult}"
+            
+            self.df.to_excel(self.file_path, index=False)
+            StyleSetting.styleSet(self.file_path, self.df)
 
     def dataCollect(self, url, item, name):
         self.driver.get(url)  # 주어진 URL로 이동
@@ -84,8 +83,9 @@ class Scrap:
         # iframe 스위치 하기 switch()
 
         try:
-            iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
-            self.driver.switch_to.frame(iframe)
+            print('1')
+            # iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
+            # self.driver.switch_to.frame(iframe)
         # except:
         #     return "iframe 전환 실패"
         
@@ -111,7 +111,7 @@ class Scrap:
                 except:
                     return "검색어 입력 실패"
 
-                for i in range(1, 11):
+                for i in range(1, 2):
                     TempList = []  # 임시 리스트 초기화
                     Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
 
@@ -194,49 +194,8 @@ class Scrap:
         # DataFrame을 엑셀 파일로 저장
         combined_df.to_excel(self.result_file_path, index=False)
 
-        # 엑셀 파일 열기 및 스타일 적용
-        wb = load_workbook(self.result_file_path)
-        ws = wb.active
-
-        fill = PatternFill(start_color="FAC090", end_color="FAC090", fill_type="solid")  # 셀 배경색 설정
-        font = Font(bold=True)  # 글자 볼드체 설정
-        border = Border(left=Side(style='thin'),
-                        right=Side(style='thin'),
-                        top=Side(style='thin'),
-                        bottom=Side(style='thin'))  # 셀 테두리 설정 (좌, 우, 상, 하)
-
-        # 컬럼 헤더 스타일 설정
-        for col in range(1, len(tempcolumns) + 1):
-            cell = ws.cell(row=1, column=col)
-            cell.fill = fill
-            cell.font = font
-            cell.border = border
-
-        wb.save(self.result_file_path)  # 엑셀 파일 저장
-
-    def save_success_status(self, item):  # openpyxl을 사용하여 기존 엑셀 파일을 열고, 성공 여부를 업데이트 및 스타일을 설정합니다.
-        wb = load_workbook(self.file_path)  # 기존 엑셀 파일 열기
-        ws = wb.active  # 활성 시트 가져오기
-        row_index = item + 2  # 엑셀 행 인덱스 설정 (1-based index)
-        col_index = self.df.columns.get_loc('성공여부') + 1  # 엑셀 열 인덱스 설정 (1-based index)
-        cell = ws.cell(row=row_index, column=col_index)  # 해당 셀 가져오기
-        cell.value = self.df.loc[item, '성공여부']  # 성공 여부 업데이트
-
         # 스타일 설정
-        if row_index == 2:
-            fill = PatternFill(start_color="FAC090", end_color="FAC090", fill_type="solid")  # 셀 배경색 설정
-            font = Font(bold=True)  # 글자 볼드체 설정
-            border = Border(left=Side(style='thin'),
-                            right=Side(style='thin'),
-                            top=Side(style='thin'),
-                            bottom=Side(style='thin'))  # 셀 테두리 설정 (좌, 우, 상, 하)
-
-            header_cell = ws.cell(row=1, column=col_index)
-            header_cell.fill = fill
-            header_cell.font = font
-            header_cell.border = border
-
-        wb.save(self.file_path)  # 엑셀 파일 저장
+        StyleSetting.styleSet(self.result_file_path, combined_df)
 
     def __del__(self):  # Scrap 클래스가 삭제될 때 웹 드라이버를 종료합니다.
         self.driver.quit()
