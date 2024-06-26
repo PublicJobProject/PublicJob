@@ -63,6 +63,8 @@ class Scrap:
 
         # xPath에 iframe이 포함되어 있는지 확인
         xPathPattern = r'<xPath>(.*?)</xPath>'
+        xPathmatch = False # 초기화
+
         if 검색어입력Xpath in xPathPattern:
             xPathmatch = True
             
@@ -158,6 +160,7 @@ class Scrap:
                     return "목록 버튼 클릭 실패"
 
         self.make_df_file(self.DataList)  # DataFrame으로 변환하여 파일로 저장
+        self.driver.switch_to.default_content()
         return "성공"
 
     def get_element_text_or_none(self, xpath, columnName, mainText):
