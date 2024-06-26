@@ -62,10 +62,10 @@ class Scrap:
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
         # xPath에 iframe이 포함되어 있는지 확인
-        xPathPattern = r'<xPath>(.*?)</xPath>'
+        xPathPattern = '<xPath>'
         xPathmatch = False # False로 초기화
         
-        if 검색어입력Xpath in xPathPattern:
+        if  xPathPattern in 검색어입력Xpath:
             xPathmatch = True
             
         # iframe 이포함되어 있다면 모든 엑스페스 전부 ifrmae 벗기기
@@ -162,6 +162,7 @@ class Scrap:
                         return "목록 버튼 클릭 실패"
 
         self.make_df_file(self.DataList)  # DataFrame으로 변환하여 파일로 저장
+        self.driver.switch_to.default_content()
         self.driver.switch_to.default_content()
         return "성공"
 
