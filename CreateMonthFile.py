@@ -57,7 +57,7 @@ def createFile():
                             right=Side(style='thin'), 
                             top=Side(style='thin'), 
                             bottom=Side(style='thin'))  # 셀 테두리 설정 (좌, 우, 상, 하)
-
+            
             # 헤더 셀에 스타일 적용
             for cell in sheet[1]:
                 cell.fill = fill  # 배경색 적용
@@ -73,6 +73,3 @@ def createFile():
     except Exception as e:
         print(f"오류 발생: {str(e)}")
     return currentDate
-
-# 폴더 생성 및 파일 생성 예제 실행
-createFile()
