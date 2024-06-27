@@ -27,9 +27,9 @@ def createFile():
         # 지자체 희망일자리 폴더 안쪽에 RPA 관리 리스트_한개시트.xlsx 파일이 없으면 복사
         rpaFile = os.path.join(basePath, "RPA 관리 리스트_한개시트.xlsx")
         if not os.path.exists(rpaFile):
-            # 환경 변수에서 문서 디렉토리 가져오기
-            userDocuments = os.path.join(os.environ['USERPROFILE'], 'Documents')
-            sourceFile = os.path.join(userDocuments, "RPA 관리 리스트 원본", "RPA 관리 리스트_한개시트.xlsx")
+            # 현재 작업 디렉토리 가져오기
+            currentWorkingDir = os.getcwd()
+            sourceFile = os.path.join(currentWorkingDir, "RPA 관리 리스트_한개시트.xlsx")
             if os.path.exists(sourceFile):
                 shutil.copy(sourceFile, rpaFile)  # 파일 복사
                 print(f"{rpaFile} 파일이 복사되었습니다.")
@@ -73,5 +73,6 @@ def createFile():
     except Exception as e:
         print(f"오류 발생: {str(e)}")
     return currentDate
+
 # 폴더 생성 및 파일 생성 예제 실행
-#createFile()
+createFile()
