@@ -49,8 +49,6 @@ class Scrap:
         게시물Xpath = self.df.loc[item, '게시물Xpath']  # DataFrame에서 '게시물Xpath' 가져오기
         검색어 = self.df.loc[item, '검색어']  # DataFrame에서 '검색어' 가져오기
         검색어List = 검색어.split(";")  # ';'을 기준으로 검색어를 리스트로 변환
-        startIndex = 1
-        stepIndex = 1
         # DataFrame에서 각 항목의 XPath 가져오기
         게시물_사업명Xpath = self.df.loc[item, '게시물_사업명Xpath']
         게시물_신청기간Xpath = self.df.loc[item, '게시물_신청기간Xpath']
@@ -83,23 +81,19 @@ class Scrap:
             게시물목록Xpath = xPathParsing.xPathParse(게시물목록Xpath)
         
         #게시물Xpath 인덱스 가공하기(시작 인덱스가 0이 아닌 경우)
-        print(게시물Xpath)
         게시물XpathList =  게시물Xpath.split(';') # ;로 자르기
         게시물Xpath = ';'.join(게시물XpathList[:2]) # 2번째 인덱스까지 ;로 join하기
-        print(게시물Xpath)
         removedtext = ';'.join(게시물XpathList[2:]) # 2번째 인덱스 이후(시작 인덱스, step 인덱스)만 추출하기
-        if len(removedtext) >= 1:
-             startIndex = removedtext[0]
-             startIndex
-        if len(removedtext) == 3:
-             stepIndex = removedtext[-1]
-             stepIndex
+        startIndex, stepIndex = (int(removedtext[0]), int(removedtext[-1])) if len(removedtext) == 3 else (int(removedtext[0]), 1) if len(removedtext) == 1 else (1,1)
+        # if len(removedtext) >= 1:
+        #     startIndex = int(removedtext[0])
+        #     if len(removedtext) == 3: # step 인덱스가 존재하는 경우 글자 길이가 3
+        #         stepIndex = int(removedtext[-1])
         
 
 
         # iframe 스위치 하기 switch()
         try:
-            #print('1')
             iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
             self.driver.switch_to.frame(iframe)
         except:
