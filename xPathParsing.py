@@ -1,5 +1,4 @@
 import re
-
 def xPathParse(xPath):
     # iframe 제거한 내용을 추출
     xPathPattern = r'<xPath>(.*?)</xPath>'
