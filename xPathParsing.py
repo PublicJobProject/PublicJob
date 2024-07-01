@@ -1,7 +1,5 @@
 import re
 
-xPath = "<xPath>//input[@type='text' and @class='search']tr[;]</xPath><FrameInfoList><FrameInfo TagName='iframe' Name='' Title='새올 행정시스템' Id='' Class='' /></FrameInfoList>"
-
 def xPathParse(xPath):
     # iframe 제거한 내용을 추출
     xPathPattern = r'<xPath>(.*?)</xPath>'
@@ -37,6 +35,3 @@ def xPathParse(xPath):
         FullxPathmatches = ''.join(xPathmatches)
         print(FullxPathmatches)
         return FullxPathmatches
-
-
-xPathParse(xPath)
