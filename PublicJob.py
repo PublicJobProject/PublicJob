@@ -59,12 +59,27 @@ class Scrap:
         게시물_문의처Xpath = self.df.loc[item, '게시물_문의처Xpath']
         게시물목록Xpath = self.df.loc[item, '게시물목록Xpath']
 
+<<<<<<< Updated upstream
         # xPath에 iframe이 포함되어 있는지 확인
         xPathPattern = '<xPath>'
         xPathmatch = False # False로 초기화
         
         if  xPathPattern in 검색어입력Xpath:
             xPathmatch = True
+=======
+        self.driver.get(url)  # 주어진 URL로 이동
+
+        for value in 검색어List: # 
+            try:
+                getText = ""
+                for i in range(3):
+                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                    if getText == "":
+                        break
+            except:
+                return "검색어입력Xpath를 찾을 수 없습니다"
+>>>>>>> Stashed changes
             
         # iframe 이포함되어 있다면 모든 엑스페스 전부 ifrmae 벗기기 (추가 가공 작업)
         if xPathmatch:
@@ -115,6 +130,7 @@ class Scrap:
                 for i in range(3):
                     self.driver.find_element(By.XPATH, 검색어입력Xpath).send_keys(value)  # 검색어 입력
                     self.driver.find_element(By.XPATH, 클릭Xpath).click()
+<<<<<<< Updated upstream
                     getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
                     if getText == value:
                         break
@@ -122,6 +138,26 @@ class Scrap:
                 return "검색어 입력 실패"
 
             for i in range(startIndex, startIndex + stepIndex*9 + 1,stepIndex):
+=======
+                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute(value)
+                    if getText == value:
+                        break
+                    if getText != value:
+                        self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()
+            except:
+                return "검색어 입력 실패"
+                                
+            #try: # 검색버튼 클릭
+            #    for i in range(3):
+            #        self.driver.find_element(By.XPATH, 클릭Xpath).click()  # 검색 버튼 클릭
+            #        First게시물Xpath = 게시물Xpath.replace(";", str(1))  # 게시물 XPath의 ';'를 숫자로 대체
+            #        if First게시물Xpath != "":
+            #            break
+            #except:
+            #    return "클릭Xpath를 찾을 수 없습니다."
+            
+            for i in range(1, 11):
+>>>>>>> Stashed changes
                 TempList = []  # 임시 리스트 초기화
                 Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
 
