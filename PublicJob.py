@@ -88,17 +88,17 @@ class Scrap:
                 self.driver.switch_to.frame(iframe)
             except:
                 return "iframe 전환 실패"
-        
-        for value in 검색어List:
-            try:
-                getText = ""
-                for i in range(3):
-                    self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
-                    getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
-                    if getText == "":
-                        break
-            except:
-                return "검색어입력Xpath를 찾을 수 없습니다"
+            finally:
+                for value in 검색어List:
+                    try:
+                        getText = ""
+                        for i in range(3):
+                            self.driver.find_element(By.XPATH, 검색어입력Xpath).clear()  # 검색어 입력란 초기화
+                            getText = self.driver.find_element(By.XPATH, 검색어입력Xpath).get_attribute("value")
+                            if getText == "":
+                                break
+                    except:
+                        return "검색어입력Xpath를 찾을 수 없습니다"
 
             try:
                 for i in range(3):
