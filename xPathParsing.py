@@ -2,7 +2,6 @@ import re
 def xPathParse(xPath):
     # iframe 제거한 내용을 추출
     xPathPattern = r'<xPath>(.*?)</xPath>'
-
     if not isinstance(xPath, str) or xPath == "X" or xPath == "x":
         print("xPath가 스트링이 아닙니다.")
         return None
