@@ -49,7 +49,8 @@ class Scrap:
         게시물Xpath = self.df.loc[item, '게시물Xpath']  # DataFrame에서 '게시물Xpath' 가져오기
         검색어 = self.df.loc[item, '검색어']  # DataFrame에서 '검색어' 가져오기
         검색어List = 검색어.split(";")  # ';'을 기준으로 검색어를 리스트로 변환
-
+        startIndex = 1
+        stepIndex = 1
         # DataFrame에서 각 항목의 XPath 가져오기
         게시물_사업명Xpath = self.df.loc[item, '게시물_사업명Xpath']
         게시물_신청기간Xpath = self.df.loc[item, '게시물_신청기간Xpath']
@@ -67,7 +68,7 @@ class Scrap:
         if  xPathPattern in 검색어입력Xpath:
             xPathmatch = True
             
-        # iframe 이포함되어 있다면 모든 엑스페스 전부 ifrmae 벗기기
+        # iframe 이포함되어 있다면 모든 엑스페스 전부 ifrmae 벗기기 (추가 가공 작업)
         if xPathmatch:
             검색어입력Xpath = xPathParsing.xPathParse(검색어입력Xpath)
             클릭Xpath = xPathParsing.xPathParse(클릭Xpath)
@@ -80,15 +81,27 @@ class Scrap:
             게시물_등록일Xpath = xPathParsing.xPathParse(게시물_등록일Xpath)
             게시물_문의처Xpath = xPathParsing.xPathParse(게시물_문의처Xpath)
             게시물목록Xpath = xPathParsing.xPathParse(게시물목록Xpath)
-            
-        # iframe 스위치 하기 switch()
+        
+        #게시물Xpath 인덱스 가공하기(시작 인덱스가 0이 아닌 경우)
+        print(게시물Xpath)
+        게시물XpathList =  게시물Xpath.split(';') # ;로 자르기
+        게시물Xpath = ';'.join(게시물XpathList[:2]) # 2번째 인덱스까지 ;로 join하기
+        print(게시물Xpath)
+        removedtext = ';'.join(게시물XpathList[2:]) # 2번째 인덱스 이후(시작 인덱스, step 인덱스)만 추출하기
+        if len(removedtext) >= 1:
+             startIndex = removedtext[0]
+        if len(removedtext) == 3:
+             stepIndex = removedtext[-1]
+        
 
+
+        # iframe 스위치 하기 switch()
         try:
-            print('1')
-            # iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
-            # self.driver.switch_to.frame(iframe)
-        # except:
-        #     return "iframe 전환 실패"
+            #print('1')
+            iframe = self.driver.find_element(By.TAG_NAME, 'iframe')
+            self.driver.switch_to.frame(iframe)
+        except:
+            print("iframe 전환 실패")
         
         finally:
             for value in 검색어List:
@@ -112,7 +125,7 @@ class Scrap:
                 except:
                     return "검색어 입력 실패"
 
-                for i in range(1, 2):
+                for i in range(startIndex, startIndex + stepIndex*9 + 1,stepIndex):
                     TempList = []  # 임시 리스트 초기화
                     Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
 
