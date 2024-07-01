@@ -2,6 +2,9 @@ import re
 def xPathParse(xPath):
     # iframe 제거한 내용을 추출
     xPathPattern = r'<xPath>(.*?)</xPath>'
+    if xPath == "X":
+        return None
+    
     xPathmatches = re.findall(xPathPattern, xPath, re.DOTALL)
     
     #세미콜론 숫자 확인
