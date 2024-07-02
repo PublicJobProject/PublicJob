@@ -121,8 +121,9 @@ class Scrap:
 
                     TempList = []
                     Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
+                    displayIndex = (i - startIndex) // stepIndex + 1
                     print("="*50)
-                    print(f"{name} : [{value}] 검색어의 {startIndex + stepIndex}번째 게시물 입니다")
+                    print(f"{name} : [{value}] 검색어의 {str(displayIndex)}번째 게시물 입니다")
                     try:  # 게시물 클릭
                         for i in range(3):
                             self.driver.find_element(By.XPATH, Modified게시물Xpath).click()  # 게시물 클릭 시도
@@ -207,4 +208,4 @@ class Scrap:
         self.driver.quit()
 
 if __name__ == "__main__":
-    Jobs = Scrap()  # Scrap 클래스의 인스턴스를 생성하여 실행합니다.
+    Jobs = Scrap()  # Scrap 클래스의 인스턴스를 생성하여 실행합니다.aaaaaaaaaaaa
