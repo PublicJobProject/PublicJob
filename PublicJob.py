@@ -118,9 +118,6 @@ class Scrap:
                 for i in range(startIndex, startIndex + stepIndex*9 + 1,stepIndex):
                     TempList = []  # 임시 리스트 초기화
                     Modified게시물Xpath = 게시물Xpath.replace(";", str(i))  # 게시물 XPath의 ';'를 숫자로 대체
-
-                    TempList = []
-                    Modified게시물Xpath = 게시물Xpath.replace(";", str(i))
                     displayIndex = (i - startIndex) // stepIndex + 1
                     print("="*50)
                     print(f"{name} : [{value}] 검색어의 {str(displayIndex)}번째 게시물 입니다")
